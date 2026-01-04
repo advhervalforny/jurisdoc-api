@@ -1,7 +1,7 @@
 from uuid import UUID
 from typing import Optional
 from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column, String, ForeignKey, Text
+from sqlalchemy import Column, String, ForeignKey, Text, Integer
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from app.models.base import BaseModel, TimestampMixin
 
@@ -13,7 +13,7 @@ class LegalDocument(BaseModel, TimestampMixin, table=True):
     content: Optional[str] = Field(default=None, sa_column=Column(Text))
     doc_type: Optional[str] = Field(default=None, max_length=50)
     
-    # CORREÇÃO: Movido foreign_key para dentro do sa_column
+    # Conexão com o processo
     case_id: UUID = Field(
         sa_column=Column(
             PG_UUID(as_uuid=True), 
@@ -21,6 +21,19 @@ class LegalDocument(BaseModel, TimestampMixin, table=True):
             nullable=False
         )
     )
+
+class LegalDocumentVersion(BaseModel, TimestampMixin, table=True):
+    __tablename__ = "legal_document_versions"
     
-    # Relacionamentos
-    # case: "Case" = Relationship(back_populates="documents")
+    version_number: int = Field(sa_column=Column(Integer, nullable=False))
+    file_path: str = Field(max_length=512)
+    change_description: Optional[str] = Field(default=None, max_length=255)
+    
+    # Conexão com o documento principal
+    document_id: UUID = Field(
+        sa_column=Column(
+            PG_UUID(as_uuid=True), 
+            ForeignKey("legal_documents.id", ondelete="CASCADE"),
+            nullable=False
+        )
+    )
