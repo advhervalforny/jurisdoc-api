@@ -32,7 +32,7 @@ sse-starlette==2.0.0
 pydantic==2.6.1
 pydantic-settings==2.1.0
 python-dotenv==1.0.1
-httpx==0.26.0
+httpx==0.25.2
 
 # Security
 passlib[bcrypt]==1.7.4
