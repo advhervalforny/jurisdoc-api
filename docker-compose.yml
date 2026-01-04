@@ -1,0 +1,45 @@
+# JurisDoc Backend - Docker Compose
+# Sistema Jurídico Inteligente AI-First
+
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: jurisdoc-api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - DATABASE_URL=${DATABASE_URL}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+    volumes:
+      - ./app:/app/app  # Hot reload em desenvolvimento
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Para desenvolvimento local (se não usar Supabase Cloud)
+  # db:
+  #   image: supabase/postgres:15.1.0.117
+  #   container_name: jurisdoc-db
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     POSTGRES_DB: jurisdoc
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+
+# volumes:
+#   postgres_data:

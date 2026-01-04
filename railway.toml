@@ -1,0 +1,27 @@
+# railway.toml - Railway Configuration
+# Deploy: https://docs.railway.app/deploy/config-as-code
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "pip install --upgrade pip && pip install -r requirements.txt"
+
+[deploy]
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+# ==================== NOTAS ====================
+#
+# Variáveis de ambiente necessárias (configurar no Railway Dashboard):
+#
+# SUPABASE_URL=https://xxx.supabase.co
+# SUPABASE_ANON_KEY=eyJ...
+# SUPABASE_SERVICE_ROLE_KEY=eyJ...
+# DATABASE_URL=postgresql://postgres:password@db.xxx.supabase.co:5432/postgres
+# JWT_SECRET=your-secret-key-here
+# JWT_ALGORITHM=HS256
+# OPENAI_API_KEY=sk-... (opcional)
+# CORS_ORIGINS=https://your-app.lovable.app,http://localhost:5173
+# ENVIRONMENT=production

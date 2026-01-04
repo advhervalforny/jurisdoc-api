@@ -1,0 +1,77 @@
+# render.yaml - Render Blueprint
+# Deploy: https://render.com/docs/blueprint-spec
+
+services:
+  # ==================== API Backend ====================
+  - type: web
+    name: jurisdoc-api
+    runtime: python
+    plan: starter  # $7/mês - pode mudar para free
+    region: oregon  # Mais próximo do Brasil
+    
+    # Build
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    
+    # Start
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    
+    # Health Check
+    healthCheckPath: /health
+    
+    # Environment Variables
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      
+      # Supabase (configurar no dashboard)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      
+      # Database
+      - key: DATABASE_URL
+        sync: false
+      
+      # JWT
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: "HS256"
+      
+      # OpenAI (opcional - para agente genérico)
+      - key: OPENAI_API_KEY
+        sync: false
+      
+      # CORS
+      - key: CORS_ORIGINS
+        value: "https://your-lovable-app.lovable.app,http://localhost:5173"
+      
+      # Environment
+      - key: ENVIRONMENT
+        value: "production"
+    
+    # Auto Deploy
+    autoDeploy: true
+    
+    # Branch
+    branch: main
+
+# ==================== NOTAS ====================
+# 
+# 1. Crie um novo Web Service no Render
+# 2. Conecte ao repositório GitHub
+# 3. Configure as variáveis de ambiente:
+#    - SUPABASE_URL: URL do projeto Supabase
+#    - SUPABASE_ANON_KEY: Anon key do Supabase
+#    - SUPABASE_SERVICE_ROLE_KEY: Service role key (para admin)
+#    - DATABASE_URL: postgresql://... (do Supabase)
+#    - OPENAI_API_KEY: (opcional) para agente genérico com LLM
+#    - CORS_ORIGINS: URLs permitidas (Lovable, localhost)
+#
+# 4. O Render detectará automaticamente o render.yaml
+# 5. Deploy será feito automaticamente em push para main

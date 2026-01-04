@@ -1,0 +1,63 @@
+"""
+Database Configuration - Supabase/PostgreSQL
+=============================================
+
+Configuração de conexão com banco de dados.
+Usa SQLModel para ORM com suporte async.
+"""
+
+from typing import AsyncGenerator
+from sqlmodel import SQLModel
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+
+from app.core.config import settings
+
+
+# Criar engine async
+engine = create_async_engine(
+    settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://"),
+    echo=settings.DEBUG,
+    future=True
+)
+
+# Session factory
+async_session = sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
+
+
+async def init_db() -> None:
+    """
+    Inicializa o banco de dados.
+    Cria todas as tabelas definidas nos models.
+    """
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
+
+
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Dependency para injetar sessão do banco nas rotas.
+    
+    Usage:
+        @router.get("/items")
+        async def get_items(db: AsyncSession = Depends(get_session)):
+            ...
+    """
+    async with async_session() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
+
+
+async def close_db() -> None:
+    """Fecha conexões com o banco."""
+    await engine.dispose()
