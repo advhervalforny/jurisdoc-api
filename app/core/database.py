@@ -22,7 +22,7 @@ engine = create_async_engine(
 )
 
 # Session factory
-async_session = sessionmaker(
+async_session_maker = sessionmaker((
     engine,
     class_=AsyncSession,
     expire_on_commit=False
@@ -47,7 +47,7 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
         async def get_items(db: AsyncSession = Depends(get_session)):
             ...
     """
-    async with async_session() as session:
+    async with async_session_maker() as session:
         try:
             yield session
             await session.commit()
