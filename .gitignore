@@ -1,0 +1,15 @@
+# Senhas e Configurações (O MAIS IMPORTANTE)
+.env
+
+# Pastas de ambiente virtual do Python
+venv/
+.venv/
+env/
+
+# Arquivos temporários do Python
+__pycache__/
+*.py[cod]
+
+# Arquivos do sistema (Mac e Windows)
+.DS_Store
+Thumbs.db
