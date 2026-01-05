@@ -7,7 +7,6 @@ from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 class BaseModel(SQLModel):
     id: UUID = Field(
         default_factory=uuid4,
-        primary_key=True,
         sa_column=Column(PG_UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     )
     created_at: datetime = Field(
@@ -18,5 +17,5 @@ class BaseModel(SQLModel):
 class TimestampMixin(SQLModel):
     updated_at: datetime = Field(
         default_factory=datetime.utcnow,
-        sa_column=Column(DateTime(timezone=True), server_default=text("NOW()"), onupdate=datetime.utcnow, nullable=False)
+        sa_column=Column(DateTime(timezone=True), server_default=text("NOW()"), onupdate=text("now()"), nullable=False)
     )
