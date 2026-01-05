@@ -1,26 +1,22 @@
-from uuid import UUID, uuid4
 from datetime import datetime
+from uuid import UUID, uuid4
 from sqlmodel import SQLModel, Field
-from sqlalchemy import text
+from sqlalchemy import Column, DateTime, text
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
 class BaseModel(SQLModel):
-    # Definimos de forma simples para evitar conflito entre tabelas
     id: UUID = Field(
         default_factory=uuid4,
         primary_key=True,
-        index=True,
-        nullable=False
+        sa_column=Column(PG_UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
+    )
+    created_at: datetime = Field(
+        default_factory=datetime.utcnow,
+        sa_column=Column(DateTime(timezone=True), server_default=text("NOW()"), nullable=False)
     )
 
 class TimestampMixin(SQLModel):
-    created_at: datetime = Field(
-        default_factory=datetime.utcnow,
-        sa_column_kwargs={"server_default": text("now()")}
-    )
     updated_at: datetime = Field(
         default_factory=datetime.utcnow,
-        sa_column_kwargs={
-            "server_default": text("now()"),
-            "onupdate": text("now()")
-        }
+        sa_column=Column(DateTime(timezone=True), server_default=text("NOW()"), onupdate=datetime.utcnow, nullable=False)
     )
