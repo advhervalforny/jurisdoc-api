@@ -1,7 +1,7 @@
 from uuid import UUID
 from typing import Optional, List, TYPE_CHECKING
-from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column, String, ForeignKey, text
+from sqlmodel import Field, Relationship
+from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from app.models.base import BaseModel, TimestampMixin
 
@@ -12,10 +12,11 @@ if TYPE_CHECKING:
 
 class Case(BaseModel, TimestampMixin, table=True):
     __tablename__ = "cases"
-    # user_id aponta para auth.users do Supabase
+    
+    # user_id refere-se ao ID do Supabase Auth
     user_id: UUID = Field(sa_column=Column(PG_UUID(as_uuid=True), nullable=False, index=True))
     
-    # CORREÇÃO: ForeignKey movida para dentro do sa_column
+    # CORREÇÃO: ForeignKey para garantir integridade referencial
     legal_area_id: UUID = Field(
         sa_column=Column(
             PG_UUID(as_uuid=True),
