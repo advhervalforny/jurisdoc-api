@@ -1,7 +1,6 @@
-from typing import AsyncGenerator
-from sqlmodel import SQLModel
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from sqlmodel import SQLModel
 from app.core.config import settings
 
 engine = create_async_engine(
@@ -10,7 +9,7 @@ engine = create_async_engine(
     future=True
 )
 
-# NOME CORRIGIDO PARA async_session_maker
+# NOME UNIFICADO PARA O DEPS.PY
 async_session_maker = sessionmaker(
     engine,
     class_=AsyncSession,
