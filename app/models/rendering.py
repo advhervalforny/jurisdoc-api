@@ -9,25 +9,20 @@ from app.models.base import BaseModel
 if TYPE_CHECKING:
     from app.models.document import LegalDocumentVersion
 
-# ... (RenderFormat Enum)
+class RenderFormat(str, Enum):
+    MARKDOWN = "markdown"
+    HTML = "html"
+    DOCX = "docx"
+    PDF = "pdf"
 
 class DocumentRendering(BaseModel, table=True):
     __tablename__ = "document_renderings"
     document_version_id: UUID = Field(
-        sa_column=Column(
-            PG_UUID(as_uuid=True),
-            ForeignKey("legal_document_versions.id"),
-            nullable=False,
-            index=True
-        )
+        sa_column=Column(PG_UUID(as_uuid=True), ForeignKey("legal_document_versions.id"), nullable=False, index=True)
     )
     rendered_text: str = Field(sa_column=Column(Text, nullable=False))
     render_format: RenderFormat = Field(
         default=RenderFormat.MARKDOWN,
-        sa_column=Column(
-            SAEnum(RenderFormat, name="render_format", create_type=False),
-            nullable=False,
-            server_default=text("'markdown'")
-        )
+        sa_column=Column(SAEnum(RenderFormat), nullable=False, server_default=text("'markdown'"))
     )
     document_version: Optional["LegalDocumentVersion"] = Relationship(back_populates="renderings")
