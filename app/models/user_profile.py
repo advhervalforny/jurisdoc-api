@@ -1,22 +1,39 @@
 from uuid import UUID
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, List, TYPE_CHECKING
 from sqlmodel import Field, Relationship
-from sqlalchemy import Column, String
+from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from app.models.base import BaseModel, TimestampMixin
 
 if TYPE_CHECKING:
     from app.models.case import Case
 
+
 class UserProfile(BaseModel, TimestampMixin, table=True):
     __tablename__ = "user_profiles"
-    
+
     user_id: UUID = Field(
-        sa_column=Column(PG_UUID(as_uuid=True), unique=True, nullable=False, index=True)
+        sa_type=PG_UUID(as_uuid=True),
+        sa_column_kwargs={"unique": True, "nullable": False, "index": True},
     )
-    full_name: str = Field(sa_column=Column(String, nullable=False))
-    oab_number: Optional[str] = Field(default=None, sa_column=Column(String, nullable=True))
-    oab_state: Optional[str] = Field(default=None, sa_column=Column(String(2), nullable=True))
-    phone: Optional[str] = Field(default=None, sa_column=Column(String, nullable=True))
-    
-    cases: list["Case"] = Relationship(back_populates="user_profile")
+    full_name: str = Field(
+        sa_type=String,
+        sa_column_kwargs={"nullable": False},
+    )
+    oab_number: Optional[str] = Field(
+        default=None,
+        sa_type=String,
+        sa_column_kwargs={"nullable": True},
+    )
+    oab_state: Optional[str] = Field(
+        default=None,
+        sa_type=String(2),
+        sa_column_kwargs={"nullable": True},
+    )
+    phone: Optional[str] = Field(
+        default=None,
+        sa_type=String,
+        sa_column_kwargs={"nullable": True},
+    )
+
+    cases: List["Case"] = Relationship(back_populates="user_profile")
