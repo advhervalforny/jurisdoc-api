@@ -1,31 +1,32 @@
-"""
-Model de renderização de documentos.
-"""
 from uuid import UUID
-from typing import Optional, TYPE_CHECKING
+from enum import Enum
+from typing import Optional, List, TYPE_CHECKING
 from sqlmodel import Field, Relationship
-# Importamos ForeignKey do sqlalchemy
-from sqlalchemy import Column, Text, ForeignKey 
+from sqlalchemy import Column, Text, Enum as SAEnum, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from app.models.base import BaseModel
 
 if TYPE_CHECKING:
     from app.models.document import LegalDocumentVersion
 
-class DocumentRendering(BaseModel, table=True):
-    __tablename__ = "document_renderings"
-    
-    # CORREÇÃO: Removido 'foreign_key' do Field e adicionado 'ForeignKey' no Column
+# ... (Enums e SOURCE_HIERARCHY)
+
+class LegalAssertion(BaseModel, table=True):
+    __tablename__ = "legal_assertions"
     document_version_id: UUID = Field(
         sa_column=Column(
-            # O tipo é inferido, mas a FK deve estar aqui dentro
-            ForeignKey("legal_document_versions.id"), 
+            PG_UUID(as_uuid=True),
+            ForeignKey("legal_document_versions.id"),
             nullable=False,
             index=True
         )
     )
-    
-    # Se houver campos de texto longo (como o conteúdo renderizado), aplique o mesmo:
-    rendered_content: str = Field(sa_column=Column(Text, nullable=False))
-    
-    # Relacionamentos
-    document_version: Optional["LegalDocumentVersion"] = Relationship(back_populates="renderings")
+    assertion_text: str = Field(sa_column=Column(Text, nullable=False))
+    # ... (demais campos e relacionamentos)
+
+class AssertionSource(BaseModel, table=True):
+    __tablename__ = "assertion_sources"
+    assertion_id: UUID = Field(sa_column=Column(PG_UUID(as_uuid=True), ForeignKey("legal_assertions.id"), primary_key=True))
+    source_id: UUID = Field(sa_column=Column(PG_UUID(as_uuid=True), ForeignKey("legal_sources.id"), primary_key=True))
+    assertion: Optional[LegalAssertion] = Relationship(back_populates="source_links")
+    source: Optional["LegalSource"] = Relationship(back_populates="assertion_links")
