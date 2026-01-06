@@ -45,6 +45,6 @@ class LegalDocumentVersion(BaseModel, table=True):
     created_by: VersionCreator = Field(sa_column=Column(SAEnum(VersionCreator), nullable=False))
     agent_name: Optional[str] = Field(default=None, sa_column=Column(String, nullable=True))
     
-    document: Optional[LegalDocument] = Relationship(back_populates=\"versions\")
+    document: Optional[LegalDocument] = Relationship(back_populates="versions")
     assertions: List["LegalAssertion"] = Relationship(back_populates="document_version")
     renderings: List["DocumentRendering"] = Relationship(back_populates="document_version")
