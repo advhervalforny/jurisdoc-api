@@ -6,9 +6,8 @@ from uuid import UUID
 from enum import Enum
 from typing import Optional, List, TYPE_CHECKING
 from sqlmodel import Field, Relationship
-from sqlalchemy import text, Column, Text, Integer
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-
+from sqlalchemy import text, Column, Text, Integer, String
+# Importamos o BaseModel corrigido
 from app.models.base import BaseModel
 
 if TYPE_CHECKING:
@@ -32,7 +31,7 @@ class SourceType(str, Enum):
     DOUTRINA = "doutrina"
     ARGUMENTACAO = "argumentacao"
 
-# Hierarquia normativa (DEFINIDA NO TOPO PARA EVITAR IMPORT ERRORS)
+# Hierarquia normativa definida no topo para evitar ImportError
 SOURCE_HIERARCHY = {
     SourceType.CONSTITUICAO: 1,
     SourceType.LEI: 2,
@@ -45,12 +44,12 @@ class LegalSource(BaseModel, table=True):
     """ Fonte Jurídica. """
     __tablename__ = "legal_sources"
     
-    # SQLModel lida com Enums automaticamente
+    # SQLModel mapeia Enums automaticamente
     source_type: SourceType = Field(index=True, nullable=False)
     reference: str = Field(index=True, nullable=False)
     
-    # Para campos de texto longo, usamos sa_column_kwargs
-    excerpt: str = Field(sa_column_kwargs={"type_": Text, "nullable": False})
+    # Correção: sa_column evita o conflito de tipos posicionais/keywords
+    excerpt: str = Field(sa_column=Column(Text, nullable=False))
     source_url: Optional[str] = Field(default=None, nullable=True)
     
     assertion_links: List["AssertionSource"] = Relationship(back_populates="source")
@@ -60,7 +59,7 @@ class LegalSource(BaseModel, table=True):
         return SOURCE_HIERARCHY.get(self.source_type, 99)
 
 class LegalAssertion(BaseModel, table=True):
-    """ Afirmação Jurídica (Coração do Sistema). """
+    """ Afirmação Jurídica. """
     __tablename__ = "legal_assertions"
     
     document_version_id: UUID = Field(
@@ -69,9 +68,11 @@ class LegalAssertion(BaseModel, table=True):
         nullable=False
     )
     
-    assertion_text: str = Field(sa_column_kwargs={"type_": Text, "nullable": False})
+    # Correção: sa_column para evitar conflito ArgumentError
+    assertion_text: str = Field(sa_column=Column(Text, nullable=False))
     assertion_type: AssertionType = Field(index=True, nullable=False)
     
+    # Para Enums e inteiros com default, usamos sa_column_kwargs sem o "type_"
     confidence_level: ConfidenceLevel = Field(
         default=ConfidenceLevel.MEDIO,
         sa_column_kwargs={"server_default": text("'medio'")}
@@ -88,6 +89,7 @@ class AssertionSource(BaseModel, table=True):
     """ Vínculo entre Assertion e Source. """
     __tablename__ = "assertion_sources"
     
+    # Definimos como primary_key para garantir que o vínculo seja único
     assertion_id: UUID = Field(foreign_key="legal_assertions.id", primary_key=True)
     source_id: UUID = Field(foreign_key="legal_sources.id", primary_key=True)
     
