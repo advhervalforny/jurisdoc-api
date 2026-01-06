@@ -53,6 +53,7 @@ class LegalAssertion(BaseModel, table=True):
     confidence_level: ConfidenceLevel = Field(sa_column=Column(SAEnum(ConfidenceLevel), nullable=False))
     position: int = Field(default=0)
     source_links: List["AssertionSource"] = Relationship(back_populates="assertion")
+    document_version: Optional["LegalDocumentVersion"] = Relationship(back_populates="assertions")
 
 class AssertionSource(BaseModel, table=True):
     __tablename__ = "assertion_sources"
