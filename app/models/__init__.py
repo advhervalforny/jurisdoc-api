@@ -19,96 +19,20 @@ Hierarquia de relacionamentos:
             └── DocumentAttachment
 """
 
-# Base
 from app.models.base import BaseModel, TimestampMixin
-
-# User
 from app.models.user_profile import UserProfile
-
-# Domínio Jurídico
-from app.models.legal_domain import (
-    LegalArea,
-    LegalPieceType,
-)
-
-# Case
+from app.models.legal_domain import LegalArea, LegalPieceType
 from app.models.case import Case
-
-# Document & Version
-from app.models.document import (
-    LegalDocument,
-    LegalDocumentVersion,
-    DocumentStatus,
-    VersionCreator,
-)
-
-# Assertions & Sources (CORAÇÃO DO SISTEMA)
-from app.models.assertion import (
-    LegalAssertion,
-    LegalSource,
-    AssertionSource,
-    AssertionType,
-    ConfidenceLevel,
-    SourceType,
-    SOURCE_HIERARCHY,
-)
-
-# Rendering
-from app.models.rendering import (
-    DocumentRendering,
-    RenderFormat,
-)
-
-# Attachments
+from app.models.document import LegalDocument, LegalDocumentVersion, DocumentStatus, VersionCreator
+from app.models.assertion import LegalAssertion, LegalSource, AssertionSource, AssertionType, ConfidenceLevel, SourceType, SOURCE_HIERARCHY
+from app.models.rendering import DocumentRendering, RenderFormat
 from app.models.attachment import DocumentAttachment
+from app.models.activity_log import ActivityLog, LogActions, EntityTypes
 
-# Activity Logs
-from app.models.activity_log import (
-    ActivityLog,
-    LogActions,
-    EntityTypes,
-)
-
-# Export all models for easy importing
 __all__ = [
-    # Base
-    "BaseModel",
-    "TimestampMixin",
-    
-    # User
-    "UserProfile",
-    
-    # Legal Domain
-    "LegalArea",
-    "LegalPieceType",
-    
-    # Case
-    "Case",
-    
-    # Document
-    "LegalDocument",
-    "LegalDocumentVersion",
-    "DocumentStatus",
-    "VersionCreator",
-    
-    # Assertions & Sources
-    "LegalAssertion",
-    "LegalSource",
-    "AssertionSource",
-    "AssertionType",
-    "ConfidenceLevel",
-    "SourceType",
-    "SOURCE_HIERARCHY",
-    
-    # Rendering
-    "DocumentRendering",
-    "RenderFormat",
-    
-    # Attachments
-    "DocumentAttachment",
-    
-    # Logs
-    "ActivityLog",
-    "LogActions",
-    "EntityTypes",
+    "BaseModel", "TimestampMixin", "UserProfile", "LegalArea", "LegalPieceType",
+    "Case", "LegalDocument", "LegalDocumentVersion", "DocumentStatus", "VersionCreator",
+    "LegalAssertion", "LegalSource", "AssertionSource", "AssertionType", "ConfidenceLevel",
+    "SourceType", "SOURCE_HIERARCHY", "DocumentRendering", "RenderFormat",
+    "DocumentAttachment", "ActivityLog", "LogActions", "EntityTypes"
 ]
