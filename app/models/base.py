@@ -5,23 +5,23 @@ from datetime import datetime
 from uuid import UUID, uuid4
 from typing import Optional
 from sqlmodel import SQLModel, Field
-from sqlalchemy import Column, DateTime, text
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-
+from sqlalchemy import text
 
 class BaseModel(SQLModel):
     """
     Model base com campos comuns a todas as entidades.
     """
-    # Removido sa_column. O SQLModel criará uma coluna nova para cada tabela.
-    # O tipo UUID do Python já mapeia corretamente para PG_UUID no Postgres.
+    # Usamos primary_key e index no Field. O SQLModel cuidará de criar
+    # uma nova coluna UUID para cada tabela filha.
     id: UUID = Field(
         default_factory=uuid4,
         primary_key=True,
-        index=True
+        index=True,
+        description="ID único gerado automaticamente (UUID v4)"
     )
     
-    # Use sa_column_kwargs para passar parâmetros extras sem instanciar uma Column fixa
+    # sa_column_kwargs permite passar parâmetros ao SQLAlchemy sem instanciar
+    # o objeto Column diretamente aqui, evitando conflitos entre tabelas.
     created_at: datetime = Field(
         default_factory=datetime.utcnow,
         sa_column_kwargs={
@@ -29,7 +29,6 @@ class BaseModel(SQLModel):
             "nullable": False
         }
     )
-
 
 class TimestampMixin(SQLModel):
     """
