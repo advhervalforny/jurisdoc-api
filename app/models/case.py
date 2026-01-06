@@ -25,3 +25,4 @@ class Case(BaseModel, TimestampMixin, table=True):
     legal_area: Optional["LegalArea"] = Relationship(back_populates="cases")
     documents: List["LegalDocument"] = Relationship(back_populates="case")
     attachments: List["DocumentAttachment"] = Relationship(back_populates="case")
+    user_profile: Optional["UserProfile"] = Relationship(back_populates="cases")
