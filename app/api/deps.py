@@ -1,6 +1,5 @@
 """
 Dependências de API.
-
 Injeção de dependências para rotas:
 - Sessão de banco de dados
 - Usuário autenticado
@@ -8,13 +7,13 @@ Injeção de dependências para rotas:
 """
 from typing import AsyncGenerator, Optional
 from uuid import UUID
+
 from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.core.database import async_session_maker
 from app.core.security import verify_token
-
 
 # Security scheme
 security = HTTPBearer()
@@ -52,8 +51,9 @@ async def get_current_user_id(
     token = credentials.credentials
     
     try:
-        payload = verify_token(token)
-        user_id_str = payload.get("sub")
+        # ALTERADO: verify_token agora é assíncrono
+        payload = await verify_token(token)
+        user_id_str = payload.sub  # Agora é um objeto TokenPayload, não dict
         
         if not user_id_str:
             raise HTTPException(
@@ -64,6 +64,9 @@ async def get_current_user_id(
         
         return UUID(user_id_str)
     
+    except HTTPException:
+        # Re-raise HTTPExceptions do verify_token
+        raise
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -88,8 +91,9 @@ async def get_optional_user_id(
     token = auth_header.replace("Bearer ", "")
     
     try:
-        payload = verify_token(token)
-        user_id_str = payload.get("sub")
+        # ALTERADO: verify_token agora é assíncrono
+        payload = await verify_token(token)
+        user_id_str = payload.sub  # Agora é um objeto TokenPayload, não dict
         return UUID(user_id_str) if user_id_str else None
     except:
         return None
