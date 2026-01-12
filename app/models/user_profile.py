@@ -36,4 +36,11 @@ class UserProfile(BaseModel, TimestampMixin, table=True):
         sa_column_kwargs={"nullable": True},
     )
 
-    cases: List["Case"] = Relationship(back_populates="user_profile")
+    # Relacionamento com Case - configurado para usar user_id como join
+    cases: List["Case"] = Relationship(
+        back_populates="user_profile",
+        sa_relationship_kwargs={
+            "primaryjoin": "UserProfile.user_id == Case.user_id",
+            "foreign_keys": "[Case.user_id]",
+        },
+    )
